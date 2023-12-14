@@ -1,0 +1,108 @@
+//////////////// FILE HEADER (INCLUDE IN EVERY FILE) //////////////////////////
+//
+// Title: p05 Dancing Badgers 3.0
+// Course: CS 300 Spring 2023
+//
+// Author: Atharvan Srivastava
+// Email: asrivastav45@wisc.edu
+// Lecturer: Hobbes LeGault
+//
+///////////////////////////////////////////////////////////////////////////////
+
+import java.io.File;
+
+/**
+ * This class models StarshipRobot objects which can be triggered to move or do some actions.
+ */
+public class StarshipRobot extends MovingThing {
+    private Thing destination; // destination point of this StarshipRobot
+    // at its current journey delivering food to badgers
+    private Thing source; // source point of this StarshipRobot at its
+    // current journey delivering food to badgers
+
+    /**
+     * Creates a new StarshipRobot and sets its source, destination, and speed. The start point of
+     * this this StarshipRobot is set to the (x,y) position of source.
+     *
+     * @param source      Thing object representing the start point of this StarshipRobot
+     * @param destination Thing object representing the destination point of this StarshipRobot
+     * @param speed       movement speed of this StarshipRobot
+     */
+    public StarshipRobot(Thing source, Thing destination, int speed) {
+        super(source.x, source.y, speed, "starshipRobot.png");
+        processing.loadImage("images" + File.separator + "starshipRobot.png");
+        this.source = source;
+        this.destination = destination;
+        this.speed = speed;
+        if (source.x < destination.x) {
+            isFacingRight = true;
+        } else {
+            isFacingRight = false;
+        }
+    }
+
+    /**
+     * Draws this StarshipRobot to the display window while it is in action delivering food
+     */
+    @Override
+    public void draw() {
+        // call go()
+        this.go();
+        super.draw();
+    }
+
+    /**
+     * Implements the action of this StarshipRobot. By default, an StarshipRobot object moves
+     * back-and-forth between its source and destination.
+     */
+    public void go() {
+        moveTowardsDestination();
+        // switch source and destination if this StarshipRobot reached its destination
+        if (this.isOver(this.destination)) {
+            Thing d = destination;
+            destination = source;
+            source = d;
+            isFacingRight = (!isFacingRight);
+        }
+        if (source.x < destination.x) {
+            isFacingRight = true;
+        }
+    }
+
+    /**
+     * Checks whether this StarshipRobot is over a specific Thing
+     *
+     * @param thing a given Thing object
+     * @return true if this StarshipRobot is over the Thing object passed as input, otherwise, returns
+     * false.
+     */
+    public boolean isOver(Thing thing) {
+        // (x1 < x4) && (x3 < x2) && (y1 < y4) && (y3 < y2)
+        float x1 = x - this.image().width / 2;
+        float x2 = x + this.image().width / 2;
+        float y1 = y - this.image().height / 2;
+        float y2 = y + this.image().height / 2;
+
+        float x3 = thing.x - thing.image().width / 2;
+        float x4 = thing.x + thing.image().width / 2;
+        float y3 = thing.y - thing.image().height / 2;
+        float y4 = thing.y + thing.image().height / 2;
+
+        return (x1 < x4) && (x3 < x2) && (y1 < y4) && (y3 < y2);
+    }
+
+    /**
+     * Helper method to move this StarshipRobot towards its destination
+     */
+    private void moveTowardsDestination() {
+        float dx = destination.x - this.x; // x-move towards destination
+        float dy = destination.y - this.y; // y-move towards destination
+        int d = (int) Math.sqrt(dx * dx + dy * dy); // distance to destination
+        if (d != 0) { // move!
+            this.x += speed * dx / d;
+            this.y += speed * dy / d;
+        }
+    }
+
+
+}
